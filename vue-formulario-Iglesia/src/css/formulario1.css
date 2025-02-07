@@ -1,0 +1,178 @@
+/* Contenedor principal */
+.contenedor-formulario-1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  background-color: #4a3170;
+  /* Fondo negro */
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  width: 75%;
+  /* max-width: 690px; */
+  margin: 20px auto;
+}
+
+/* Título */
+.titulo {
+  font-size: 28px;
+  color: #efe70dc2;
+  /* Color dorado */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Formulario */
+.formulario {
+  background-color: #4d4c4c;
+  /* Fondo oscuro */
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #f8f40c;
+  /* Borde dorado */
+  box-shadow: 0px 4px 6px rgba(46, 42, 42, 0.3);
+  width: 100%;
+}
+
+/*Sección 1*/
+
+.datos-personales-1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Dos columnas iguales */
+  gap: 10rem;
+  /* Espaciado entre las columnas */
+  align-items: start;
+  /* Alinea las etiquetas e inputs arriba */
+
+}
+
+.form-group-1 {
+  display: flex;
+  flex-direction: column;
+  /* Etiqueta encima del input */
+  margin-bottom: 5px;
+}
+
+/*Sección 2*/
+.datos-personales-2 {
+  margin-top: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  /* Dos columnas iguales */
+  gap: 1rem;
+  /* Espaciado entre las columnas */
+  align-items: start;
+  /* Alinea las etiquetas e inputs arriba */
+  margin-bottom: 5px;
+}
+
+.form-group-2 {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+  /* Etiqueta encima del input */
+}
+
+/*Sección 3*/
+.datos-personales-2 {
+  margin-top: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  /* Dos columnas iguales */
+  gap: 1rem;
+  /* Espaciado entre las columnas */
+  align-items: start;
+  /* Alinea las etiquetas e inputs arriba */
+  margin-bottom: 5px;
+}
+
+.form-group-2 {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+
+}
+
+/*Sección 3*/
+.datos-personales-3 {
+  margin-top: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Dos columnas iguales */
+  gap: 1rem;
+  /* Espaciado entre las columnas */
+  align-items: start;
+  /* Alinea las etiquetas e inputs arriba */
+  margin-bottom: 5px;
+}
+
+.form-group-3 {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+
+/*Sección 4*/
+.datos-personales-4 {
+  margin-top: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  /* Dos columnas iguales */
+  gap: 1rem;
+  /* Espaciado entre las columnas */
+  align-items: start;
+  /* Alinea las etiquetas e inputs arriba */
+  margin-bottom: 5px;
+}
+
+.form-group-4 {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+
+
+
+
+
+
+
+
+label {
+  font-weight: bold;
+  /* Opcional: hace que las etiquetas resalten */
+  margin-bottom: 0.5rem;
+  /* Espaciado entre la etiqueta y el input */
+  color: #f0f0f0;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: left;
+
+}
+
+input,
+select {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #2c2c2c;
+  color: #ffff;
+  font-size: 18px;
+  font-family: Arial, Helvetica, sans-serif;
+
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #007bff;
+  /* Color de enfoque */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Resalte del campo activo */
+}

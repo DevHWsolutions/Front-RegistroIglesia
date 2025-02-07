@@ -1,0 +1,81 @@
+/* Contenedor principal */
+.contenedor-login {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    /* Altura completa de la pantalla */
+    font-family: Arial, sans-serif;
+}
+
+/* Columna de la imagen */
+.columna-imagen {
+    background-color: #10091d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.columna-imagen img {
+    margin: 15px;
+    border-radius: 8rem;
+    border: 3px solid #080121;
+    background-size: cover;
+}
+
+
+/* Columna del formulario */
+.columna-formulario {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    background-color: #3c2d57;
+}
+
+
+/* Campos del formulario */
+.form-group {
+    margin-top: 2em;
+}
+
+label {
+    font-family: Arial, sans-serif;
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    color: #ffffff;
+}
+
+input {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+/* Botón */
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #6a7bd9;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #030abc;
+}
