@@ -46,7 +46,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <p>&copy; 2024 Iglesia Calvario - Todos los derechos reservados</p>
+      <p>&copy; 2025 Iglesia Calvario - Todos los derechos reservados</p>
       <p>Desarrollado por HWSolutions - Enero 2025</p>
     </footer>
   </div>

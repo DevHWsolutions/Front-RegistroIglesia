@@ -11,7 +11,7 @@ const buscar = ref("");
 
 // Paginación
 const currentPage = ref(1);
-const itemsPerPage = 15;
+const itemsPerPage = 6;
 
 // Función para resetear la contraseña
 const resetearContrasena = async (cui) => {
@@ -205,8 +205,13 @@ onMounted(loadUsuarios);
 
 .info-container {
   margin-bottom: 10px;
-  font-size: 14px;
-  color: #555;
+  color: rgb(250, 250, 13);
+  text-align: center;
+  font-family: Montserrat;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .table-wrapper {

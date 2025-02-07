@@ -127,7 +127,6 @@
               @input="validarTelefono"
               maxlength="8"
               pattern="\d*"
-              required
             />
           </div>
 
@@ -167,7 +166,6 @@
               id="direccion"
               v-model="nombrePadrino"
               placeholder="Nombre completo padrino / madrina"
-              required
             />
           </div>
 
@@ -181,7 +179,6 @@
               @input="validarTelefono"
               maxlength="8"
               pattern="\d*"
-              required
             />
           </div>
         </section>
