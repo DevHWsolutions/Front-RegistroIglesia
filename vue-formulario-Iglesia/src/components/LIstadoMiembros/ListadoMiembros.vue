@@ -23,7 +23,7 @@ const resetearContrasena = async (cui) => {
       "api/usuario/reiniciarpassword",
       {
         cui: cui,
-        password: "miembro.123",
+        password: "socio.2025",
         act_password: true,
       },
       {
