@@ -2,6 +2,28 @@
   <div class="contenedor-formulario">
     <div class="form-container">
       <h1>Actualizar Datos</h1>
+      <template v-if="contraseñaDefault">
+        <div class="caja-password">
+          <p>*Favor de actualizar su contraseña*</p>
+          <div class="input-container">
+            <!-- 🔹 Cambia entre password y text según mostrarPassword -->
+            <input
+              :type="mostrarPassword ? 'text' : 'password'"
+              v-model="nuevaContraseña"
+              placeholder="Nueva contraseña"
+            />
+            <!-- 🔹 Botón para alternar la visibilidad -->
+            <button
+              type="button"
+              class="toggle-password"
+              @click="togglePassword"
+            >
+              {{ mostrarPassword ? "👁️" : "📝" }}
+            </button>
+          </div>
+          <button @click="guardarContraseña;">Guardar</button>
+        </div>
+      </template>
 
       <form @submit.prevent="actualizarUsuario">
         <section class="seccion">
@@ -224,12 +246,14 @@
 
           <div class="form-group">
             <label for="cui">Relación:</label>
-            <select v-model="relacionFamiliar" required>
-              <option value="" disabled>Seleccione</option>
-              <option value="Familiar">Familiar</option>
-              <option value="Amistad">Amistad</option>
-              <option value="Otro">Otro</option>
-            </select>
+
+            <input
+              type="text"
+              id="direccionBeneficiario"
+              v-model="relacionFamiliar"
+              placeholder="ubiación de beneficiario"
+              required
+            />
           </div>
         </section>
 
@@ -243,6 +267,10 @@
 import { ref, onMounted, computed } from "vue";
 import api from "@/Services/api";
 import store from "@/stores/store";
+
+const mostrarPassword = ref(false);
+const nuevaContraseña = ref("");
+const contraseñaDefault = ref(false);
 
 const usuarios = ref([]);
 const loading = ref(true);
@@ -279,6 +307,12 @@ const validarCUI = () => {
     console.error("El CUI debe tener exactamente 13 dígitos.");
     alert("El CUI debe tener exactamente 13 dígitos."); // Puedes usar otro método de notificación
   }
+};
+
+// 🔹 Método para alternar visibilidad de la contraseña
+const togglePassword = () => {
+  console.log("mostrar paswword", nuevaContraseña.value);
+  mostrarPassword.value = !mostrarPassword.value;
 };
 
 const CUI = computed(() => {
@@ -344,6 +378,7 @@ const loadUsuarios = async () => {
       relacionFamiliar.value = usuarios.value[0].tipoRelacion;
       telefonoDomicilioBeneficiario.value =
         usuarios.value[0].beneficiarioTelefono;
+      contraseñaDefault.value = usuarios.value[0].passwordDefault;
 
       direccionBeneficiario.value = usuarios.value[0].beneficiarioDireccion;
     }
@@ -464,5 +499,56 @@ h2 {
 
 .btn-accion:hover {
   background: #4a148c;
+}
+.caja-password {
+  background-color: #ffefc1;
+  padding: 15px;
+  border: 2px solid #ffae00;
+  border-radius: 5px;
+  text-align: center;
+  margin: 20px auto;
+  width: 300px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.caja-password p {
+  color: red;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  background: white;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  outline: none;
+}
+
+.toggle-password {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 5px;
+}
+
+.caja-password button {
+  background-color: #ff9800;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.caja-password button:hover {
+  background-color: #e68900;
 }
 </style>
