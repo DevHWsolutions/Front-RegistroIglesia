@@ -1,85 +1,3 @@
-<script setup>
-import axios from "axios";
-import api from "@/Services/api";
-import { ref, onMounted, computed } from "vue";
-import store from "@/stores/store";
-
-const usuarios = ref([]);
-const loading = ref(true);
-const error = ref(null);
-const buscar = ref("");
-
-// Paginación
-const currentPage = ref(1);
-const itemsPerPage = 6;
-
-// Función para resetear la contraseña
-const resetearContrasena = async (cui) => {
-  try {
-    const confirmacion = confirm(`¿Reiniciar contraseña del usuario?`);
-    if (!confirmacion) return;
-    let headers = { Authorization: "Bearer " + store.state.token }; // ✅ Agregar espacio después de 'Bearer'
-    await api.put(
-      "api/usuario/reiniciarpassword",
-      {
-        cui: cui,
-        password: "socio.2025",
-        act_password: true,
-      },
-      {
-        headers: { Authorization: "Bearer " + store.state.token },
-      }
-    );
-    alert("Contraseña reiniciada exitosamente, nueva password: socio.123");
-  } catch (error) {
-    alert("Error al reiniciar contraseña");
-    console.error(error);
-  }
-};
-
-// Cargar usuarios desde la API
-const loadUsuarios = async () => {
-  try {
-    loading.value = true;
-    let headers = { Authorization: "Bearer " + store.state.token }; // ✅ Agregar espacio después de 'Bearer'
-    let configuracion = { headers: headers }; // ✅ Usar 'headers' en lugar de 'header'
-
-    const response = await api.get("api/usuario/listar", {
-      headers: { Authorization: "Bearer " + store.state.token },
-      params: { buscar: buscar.value },
-    });
-    usuarios.value = response.data;
-    error.value = null;
-  } catch (err) {
-    error.value = "Error al cargar usuarios";
-    console.error(err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// Calcular usuarios de la página actual
-const paginatedUsuarios = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return usuarios.value.slice(start, start + itemsPerPage);
-});
-
-// Total de páginas
-const totalPages = computed(() =>
-  Math.ceil(usuarios.value.length / itemsPerPage)
-);
-
-// Cambiar página
-const cambiarPagina = (pagina) => {
-  if (pagina >= 1 && pagina <= totalPages.value) {
-    currentPage.value = pagina;
-  }
-};
-
-// Cargar datos al montar el componente
-onMounted(loadUsuarios);
-</script>
-
 <template>
   <div class="container">
     <!-- Barra de búsqueda -->
@@ -90,6 +8,9 @@ onMounted(loadUsuarios);
         placeholder="Buscar usuario..."
         @input="loadUsuarios"
       />
+      <button class="btn_descargar-listado" @click="DescargarInformacion">
+        Descargar Listado
+      </button>
     </div>
 
     <!-- Número de registros -->
@@ -102,7 +23,7 @@ onMounted(loadUsuarios);
 
     <!-- Tabla de usuarios -->
     <div class="table-wrapper">
-      <table>
+      <table id="miTabla">
         <thead>
           <tr>
             <th>#</th>
@@ -176,6 +97,186 @@ onMounted(loadUsuarios);
     </div>
   </div>
 </template>
+
+<script setup>
+import axios from "axios";
+import api from "@/Services/api";
+import { ref, onMounted, computed } from "vue";
+import store from "@/stores/store";
+import * as XLSX from "xlsx"; // Asegúrate de importar la librería
+
+const usuarios = ref([]);
+const loading = ref(true);
+const error = ref(null);
+const buscar = ref("");
+
+// Paginación
+const currentPage = ref(1);
+const itemsPerPage = 6;
+
+// Función para resetear la contraseña
+const resetearContrasena = async (cui) => {
+  try {
+    const confirmacion = confirm(`¿Reiniciar contraseña del usuario?`);
+    if (!confirmacion) return;
+    let headers = { Authorization: "Bearer " + store.state.token }; // ✅ Agregar espacio después de 'Bearer'
+    await api.put(
+      "api/usuario/reiniciarpassword",
+      {
+        cui: cui,
+        password: "socio.2025",
+        act_password: true,
+      },
+      {
+        headers: { Authorization: "Bearer " + store.state.token },
+      }
+    );
+    alert("Contraseña reiniciada exitosamente, nueva password: socio.123");
+  } catch (error) {
+    alert("Error al reiniciar contraseña");
+    console.error(error);
+  }
+};
+
+// Cargar usuarios desde la API
+const loadUsuarios = async () => {
+  try {
+    loading.value = true;
+    let headers = { Authorization: "Bearer " + store.state.token }; // ✅ Agregar espacio después de 'Bearer'
+    let configuracion = { headers: headers }; // ✅ Usar 'headers' en lugar de 'header'
+
+    const response = await api.get("api/usuario/listar", {
+      headers: { Authorization: "Bearer " + store.state.token },
+      params: { buscar: buscar.value },
+    });
+    usuarios.value = response.data;
+    error.value = null;
+  } catch (err) {
+    error.value = "Error al cargar usuarios";
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+//Metodo para descargar informacion
+const DescargarInformacion = async () => {
+  try {
+    let headers = { Authorization: "Bearer " + store.state.token };
+
+    // Obtener datos de la API
+    const response = await api.get("api/Miembro/DescargarListado", { headers });
+    const OBJ = response.data; // Datos obtenidos
+
+    // Definir los encabezados
+    const Header = [
+      "CUI",
+      "Estado",
+      "Tipo",
+      "Nombres",
+      "Apellidos",
+      "Sexo",
+      "Fecha de Nacimiento",
+      "Info Papa",
+      "Info Mama",
+      "Dirección",
+      "Zona",
+      "Referencia",
+      "Teléfono 1",
+      "Teléfono 2",
+      "Correo",
+      "Nombres Padrino",
+      "Teléfono Padrino",
+      "Beneficiario Miembro",
+      "Tipo Relación",
+      "Beneficiario Dirección",
+      "Beneficiario Teléfono",
+      "Última Cuota Pagada",
+    ];
+
+    // Definir las claves del objeto que queremos mapear
+    const Field = [
+      "cui",
+      "estado",
+      "tipo",
+      "nombres",
+      "apellidos",
+      "sexo",
+      "fechaNacimiento",
+      "infoPapa",
+      "infoMama",
+      "direccion",
+      "zona",
+      "referencia",
+      "telefono1",
+      "telefono2",
+      "correo",
+      "nombresPadrino",
+      "telefonoPadrino",
+      "beneficiarioMiembro",
+      "tipoRelacion",
+      "beneficiarioDireccion",
+      "beneficiarioTelefono",
+      "ultimaCuotaPagada",
+    ];
+
+    // Mapear los datos para que coincidan con los encabezados
+    const Data = OBJ.map((item) => Field.map((field) => item[field] || "")); // Si el campo no existe, se pone ""
+
+    // Crear una hoja de Excel con los datos
+    const ws = XLSX.utils.aoa_to_sheet([Header, ...Data]);
+
+    // Aplicar estilos a los encabezados (negrita y centrado)
+    const range = XLSX.utils.decode_range(ws["!ref"]); // Obtener el rango de celdas
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: C }); // Obtener la celda de la primera fila
+      if (!ws[cellRef]) continue;
+      ws[cellRef].s = {
+        font: { bold: true }, // Negrita
+        alignment: { horizontal: "center", vertical: "center" }, // Centrado
+      };
+    }
+
+    // Crear un libro de Excel
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "ListadoGeneral");
+
+    // Exportar el archivo Excel
+    XLSX.writeFile(wb, "ListadoSocios.xlsx");
+    console.log("Archivo generado con éxito");
+  } catch (error) {
+    console.error("Error al descargar la información:", error);
+  }
+};
+const FormatJSon = (FilterData, JsonData) => {
+  return JsonData.map((v) =>
+    FilterData.map((j) => {
+      return v[j] ?? "N/A";
+    })
+  );
+};
+
+// Calcular usuarios de la página actual
+const paginatedUsuarios = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return usuarios.value.slice(start, start + itemsPerPage);
+});
+
+// Total de páginas
+const totalPages = computed(() =>
+  Math.ceil(usuarios.value.length / itemsPerPage)
+);
+
+// Cambiar página
+const cambiarPagina = (pagina) => {
+  if (pagina >= 1 && pagina <= totalPages.value) {
+    currentPage.value = pagina;
+  }
+};
+
+// Cargar datos al montar el componente
+onMounted(loadUsuarios);
+</script>
 
 <style scoped>
 .container {
@@ -319,6 +420,19 @@ tr:hover {
 .pagination button:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+.btn_descargar-listado {
+  margin-left: 5px;
+  background: #ffa500;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.btn_descargar-listado :hover {
+  background: #ff8c00;
 }
 
 @media (max-width: 768px) {

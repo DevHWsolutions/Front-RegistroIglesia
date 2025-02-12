@@ -271,7 +271,14 @@ const direccionBeneficiario = ref("");
 const nombreBeneficiario = ref("");
 
 const validarCUI = () => {
+  // Filtra solo números y limita a 13 caracteres
   cui.value = cui.value.replace(/\D/g, "").slice(0, 13);
+
+  // Verifica si la longitud es exactamente 13
+  if (cui.value.length !== 13) {
+    console.error("El CUI debe tener exactamente 13 dígitos.");
+    alert("El CUI debe tener exactamente 13 dígitos."); // Puedes usar otro método de notificación
+  }
 };
 
 const CUI = computed(() => {
