@@ -131,7 +131,7 @@ const resetearContrasena = async (cui) => {
         headers: { Authorization: "Bearer " + store.state.token },
       }
     );
-    alert("Contraseña reiniciada exitosamente, nueva password: socio.123");
+    alert("Contraseña reiniciada exitosamente, nueva password: socio.2025");
   } catch (error) {
     alert("Error al reiniciar contraseña");
     console.error(error);
@@ -173,6 +173,7 @@ const DescargarInformacion = async () => {
       "CUI",
       "Estado",
       "Tipo",
+      "Fecha Ingreso",
       "Nombres",
       "Apellidos",
       "Sexo",
@@ -199,6 +200,7 @@ const DescargarInformacion = async () => {
       "cui",
       "estado",
       "tipo",
+      "fechaIngreso",
       "nombres",
       "apellidos",
       "sexo",

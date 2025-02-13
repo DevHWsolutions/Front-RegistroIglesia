@@ -74,6 +74,7 @@
               pattern="\d*"
               required
             />
+            <p v-if="errorCUI" class="error">{{ errorCUI }}</p>
           </div>
           <div class="form-group">
             <label for="password">Contraseña:</label>
@@ -112,6 +113,8 @@ import router from "@/Router";
 
 // Estado para alternar entre Registro y Login
 const esRegistro = ref(false);
+
+const errorCUI = ref("");
 
 // Variables de datos del formulario
 const cui = ref("");
@@ -156,8 +159,11 @@ const errorFecha = computed(() => {
 
 // Métodos
 const validarCUI = () => {
-  // Permitir solo números y limitar a 13 caracteres
+  // 🔹 Permitir solo números y cortar en 13 caracteres
   cui.value = cui.value.replace(/\D/g, "").slice(0, 13);
+
+  // 🔹 Mostrar error en tiempo real si no tiene exactamente 13 dígitos
+  errorCUI.value = cui.value.length < 13 ? "El CUI debe tener 13 dígitos." : "";
 };
 
 const iniciarSesion = async () => {
@@ -206,6 +212,10 @@ const registrarUsuario = async () => {
   });
 
   try {
+    if (errorCUI.value.length > 0) {
+      alert("El CUI debe tener exactamente 13 dígitos."); // Puedes usar otro método de notificación
+      return;
+    }
     const response = await api.post("api/usuario/crear", {
       cui: cui.value,
       password: password.value,

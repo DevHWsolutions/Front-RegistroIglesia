@@ -21,11 +21,11 @@
               {{ mostrarPassword ? "👁️" : "📝" }}
             </button>
           </div>
-          <button @click="guardarContraseña;">Guardar</button>
+          <button @click="ReinicioPasswordDefault">Guardar</button>
         </div>
       </template>
 
-      <form @submit.prevent="actualizarUsuario">
+      <form @submit.prevent="actualizarUsuario(dpi)" v-if="!contraseñaDefault">
         <section class="seccion">
           <h2 class="seccion-titulo">Información personal</h2>
           <div class="form-group">
@@ -62,6 +62,7 @@
               pattern="\d*"
               required
             />
+            <p v-if="errorCUI" class="error">{{ errorCUI }}</p>
           </div>
 
           <div class="form-group">
@@ -175,6 +176,22 @@
               placeholder="Ingrese correo"
             />
           </div>
+
+          <div class="form-group">
+            <label for="cui">Último año cancelado:</label>
+            <input
+              type="text"
+              id="ultimoaño"
+              @input="validaraniocuota"
+              v-model="ultimacuota"
+              placeholder="Ingrese el año"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="cui">Fecha Ingreso:</label>
+            <input type="date" v-model="anioingreso" required />
+          </div>
         </section>
 
         <section class="seccion">
@@ -272,6 +289,7 @@ const mostrarPassword = ref(false);
 const nuevaContraseña = ref("");
 const contraseñaDefault = ref(false);
 
+const errorCUI = ref("");
 const usuarios = ref([]);
 const loading = ref(true);
 const error = ref(null);
@@ -280,6 +298,8 @@ const apellidos = ref("");
 const sexo = ref("");
 const cui = ref("");
 const fechaNacimiento = ref("");
+const ultimacuota = ref("");
+const anioingreso = ref("");
 const padre = ref("");
 const madre = ref("");
 const direccion = ref("");
@@ -304,9 +324,16 @@ const validarCUI = () => {
 
   // Verifica si la longitud es exactamente 13
   if (cui.value.length !== 13) {
-    console.error("El CUI debe tener exactamente 13 dígitos.");
-    alert("El CUI debe tener exactamente 13 dígitos."); // Puedes usar otro método de notificación
+    errorCUI.value = "El CUI debe tener 13 dígitos.";
+    // console.error("El CUI debe tener exactamente 13 dígitos.");
+    // alert("El CUI debe tener exactamente 13 dígitos."); // Puedes usar otro método de notificación
+  } else {
+    errorCUI.value = "";
   }
+};
+
+const validaraniocuota = () => {
+  ultimacuota.value = ultimacuota.value.replace(/\D/g, "").slice(0, 4);
 };
 
 // 🔹 Método para alternar visibilidad de la contraseña
@@ -319,11 +346,38 @@ const CUI = computed(() => {
   return store.state.usuario.cui;
 });
 
+const dpi = computed(() => {
+  return store.state.usuario.CUI;
+});
+
 const fechaNacimientoFormato = computed(() => {
   return usuarios.value[0].fechaNacimiento
     ? usuarios.value[0].fechaNacimiento.split("T")[0]
     : "";
 });
+
+// Función para resetear la contraseña
+const ReinicioPasswordDefault = async (cui) => {
+  try {
+    let headers = { Authorization: "Bearer " + store.state.token }; // ✅ Agregar espacio después de 'Bearer'
+    await api.put(
+      "api/usuario/ReiniciarDefaultPassword",
+      {
+        cui: dpi.value,
+        password: nuevaContraseña.value,
+        act_password: true,
+      },
+      {
+        headers: { Authorization: "Bearer " + store.state.token },
+      }
+    );
+    alert("Contraseña reiniciada exitosamente");
+    loadUsuarios();
+  } catch (error) {
+    alert("Error al reiniciar contraseña");
+    console.error(error);
+  }
+};
 
 const validarTelefono = () => {
   telefonoDomicilio.value = telefonoDomicilio.value
@@ -379,7 +433,8 @@ const loadUsuarios = async () => {
       telefonoDomicilioBeneficiario.value =
         usuarios.value[0].beneficiarioTelefono;
       contraseñaDefault.value = usuarios.value[0].passwordDefault;
-
+      ultimacuota.value = usuarios.value[0].ultimocuotaanio;
+      anioingreso.value = usuarios.value[0].fechaingreso.split("T")[0];
       direccionBeneficiario.value = usuarios.value[0].beneficiarioDireccion;
     }
     console.log(usuarios.value);
@@ -415,6 +470,8 @@ const actualizarUsuario = async () => {
         beneficiarioMiembro: nombreBeneficiario.value,
         tipoRelacion: relacionFamiliar.value,
         beneficiarioTelefono: telefonoDomicilioBeneficiario.value,
+        ultimocuotaanio: ultimacuota.value,
+        fechaingreso: anioingreso.value,
         beneficiarioDireccion: direccionBeneficiario.value,
       },
       {
