@@ -55,7 +55,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.matched.some((record) => record.meta.libre)) {
     next();
-  } else if (store.state.usuario && store.state.usuario.Rol == "SAD0") {
+  } else if (store.state.usuario && store.state.usuario.Rol == "SADM") {
     if (to.matched.some((record) => record.meta.SAD0)) {
       next();
     } else {
