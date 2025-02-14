@@ -72,7 +72,7 @@ export default {
       return store.state.usuario;
     },
     esSAD() {
-      return store.state.usuario && store.state.usuario.Rol == "SAD0";
+      return store.state.usuario && store.state.usuario.Rol == "SADM";
     },
     esAdministrador() {
       return store.state.usuario && store.state.usuario.Rol == "ADM1";
