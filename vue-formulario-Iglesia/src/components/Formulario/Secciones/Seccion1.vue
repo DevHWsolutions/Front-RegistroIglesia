@@ -2,8 +2,30 @@
   <div class="contenedor-formulario">
     <div class="form-container">
       <h1>Actualizar Datos</h1>
+      <template v-if="contraseñaDefault">
+        <div class="caja-password">
+          <p>*Favor de actualizar su contraseña*</p>
+          <div class="input-container">
+            <!-- 🔹 Cambia entre password y text según mostrarPassword -->
+            <input
+              :type="mostrarPassword ? 'text' : 'password'"
+              v-model="nuevaContraseña"
+              placeholder="Nueva contraseña"
+            />
+            <!-- 🔹 Botón para alternar la visibilidad -->
+            <button
+              type="button"
+              class="toggle-password"
+              @click="togglePassword"
+            >
+              {{ mostrarPassword ? "👁️" : "📝" }}
+            </button>
+          </div>
+          <button @click="ReinicioPasswordDefault">Guardar</button>
+        </div>
+      </template>
 
-      <form @submit.prevent="actualizarUsuario">
+      <form @submit.prevent="actualizarUsuario(dpi)" v-if="!contraseñaDefault">
         <section class="seccion">
           <h2 class="seccion-titulo">Información personal</h2>
           <div class="form-group">
@@ -40,6 +62,7 @@
               pattern="\d*"
               required
             />
+            <p v-if="errorCUI" class="error">{{ errorCUI }}</p>
           </div>
 
           <div class="form-group">
@@ -153,6 +176,22 @@
               placeholder="Ingrese correo"
             />
           </div>
+
+          <div class="form-group">
+            <label for="cui">Último año cancelado:</label>
+            <input
+              type="text"
+              id="ultimoaño"
+              @input="validaraniocuota"
+              v-model="ultimacuota"
+              placeholder="Ingrese el año"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="cui">Fecha Ingreso:</label>
+            <input type="date" v-model="anioingreso" required />
+          </div>
         </section>
 
         <section class="seccion">
@@ -224,12 +263,14 @@
 
           <div class="form-group">
             <label for="cui">Relación:</label>
-            <select v-model="relacionFamiliar" required>
-              <option value="" disabled>Seleccione</option>
-              <option value="Familiar">Familiar</option>
-              <option value="Amistad">Amistad</option>
-              <option value="Otro">Otro</option>
-            </select>
+
+            <input
+              type="text"
+              id="direccionBeneficiario"
+              v-model="relacionFamiliar"
+              placeholder="ubiación de beneficiario"
+              required
+            />
           </div>
         </section>
 
@@ -244,6 +285,11 @@ import { ref, onMounted, computed } from "vue";
 import api from "@/Services/api";
 import store from "@/stores/store";
 
+const mostrarPassword = ref(false);
+const nuevaContraseña = ref("");
+const contraseñaDefault = ref(false);
+
+const errorCUI = ref("");
 const usuarios = ref([]);
 const loading = ref(true);
 const error = ref(null);
@@ -252,6 +298,8 @@ const apellidos = ref("");
 const sexo = ref("");
 const cui = ref("");
 const fechaNacimiento = ref("");
+const ultimacuota = ref("");
+const anioingreso = ref("");
 const padre = ref("");
 const madre = ref("");
 const direccion = ref("");
@@ -271,11 +319,35 @@ const direccionBeneficiario = ref("");
 const nombreBeneficiario = ref("");
 
 const validarCUI = () => {
+  // Filtra solo números y limita a 13 caracteres
   cui.value = cui.value.replace(/\D/g, "").slice(0, 13);
+
+  // Verifica si la longitud es exactamente 13
+  if (cui.value.length !== 13) {
+    errorCUI.value = "El CUI debe tener 13 dígitos.";
+    // console.error("El CUI debe tener exactamente 13 dígitos.");
+    // alert("El CUI debe tener exactamente 13 dígitos."); // Puedes usar otro método de notificación
+  } else {
+    errorCUI.value = "";
+  }
+};
+
+const validaraniocuota = () => {
+  ultimacuota.value = ultimacuota.value.replace(/\D/g, "").slice(0, 4);
+};
+
+// 🔹 Método para alternar visibilidad de la contraseña
+const togglePassword = () => {
+  console.log("mostrar paswword", nuevaContraseña.value);
+  mostrarPassword.value = !mostrarPassword.value;
 };
 
 const CUI = computed(() => {
   return store.state.usuario.cui;
+});
+
+const dpi = computed(() => {
+  return store.state.usuario.CUI;
 });
 
 const fechaNacimientoFormato = computed(() => {
@@ -283,6 +355,29 @@ const fechaNacimientoFormato = computed(() => {
     ? usuarios.value[0].fechaNacimiento.split("T")[0]
     : "";
 });
+
+// Función para resetear la contraseña
+const ReinicioPasswordDefault = async (cui) => {
+  try {
+    let headers = { Authorization: "Bearer " + store.state.token }; // ✅ Agregar espacio después de 'Bearer'
+    await api.put(
+      "api/usuario/ReiniciarDefaultPassword",
+      {
+        cui: dpi.value,
+        password: nuevaContraseña.value,
+        act_password: true,
+      },
+      {
+        headers: { Authorization: "Bearer " + store.state.token },
+      }
+    );
+    alert("Contraseña reiniciada exitosamente");
+    loadUsuarios();
+  } catch (error) {
+    alert("Error al reiniciar contraseña");
+    console.error(error);
+  }
+};
 
 const validarTelefono = () => {
   telefonoDomicilio.value = telefonoDomicilio.value
@@ -337,7 +432,9 @@ const loadUsuarios = async () => {
       relacionFamiliar.value = usuarios.value[0].tipoRelacion;
       telefonoDomicilioBeneficiario.value =
         usuarios.value[0].beneficiarioTelefono;
-
+      contraseñaDefault.value = usuarios.value[0].passwordDefault;
+      ultimacuota.value = usuarios.value[0].ultimocuotaanio;
+      anioingreso.value = usuarios.value[0].fechaingreso.split("T")[0];
       direccionBeneficiario.value = usuarios.value[0].beneficiarioDireccion;
     }
     console.log(usuarios.value);
@@ -373,6 +470,8 @@ const actualizarUsuario = async () => {
         beneficiarioMiembro: nombreBeneficiario.value,
         tipoRelacion: relacionFamiliar.value,
         beneficiarioTelefono: telefonoDomicilioBeneficiario.value,
+        ultimocuotaanio: ultimacuota.value,
+        fechaingreso: anioingreso.value,
         beneficiarioDireccion: direccionBeneficiario.value,
       },
       {
@@ -457,5 +556,56 @@ h2 {
 
 .btn-accion:hover {
   background: #4a148c;
+}
+.caja-password {
+  background-color: #ffefc1;
+  padding: 15px;
+  border: 2px solid #ffae00;
+  border-radius: 5px;
+  text-align: center;
+  margin: 20px auto;
+  width: 300px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.caja-password p {
+  color: red;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  background: white;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  outline: none;
+}
+
+.toggle-password {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 5px;
+}
+
+.caja-password button {
+  background-color: #ff9800;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.caja-password button:hover {
+  background-color: #e68900;
 }
 </style>
